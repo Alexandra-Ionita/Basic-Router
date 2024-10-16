@@ -1,0 +1,80 @@
+****Name: Ionita Alexandra-Mihaela
+****Group: 324CB
+
+                        Dataplane Router
+                           100/100
+
+I have implemented all the tasks, including the ARP Protocol one. I took a sleep
+day to finish the homework and I completed the request about it. I also tried to
+do the rtable_entry search efficient by sorting it with qsort and searching for
+the entry using binary search.
+
+*** Description ***
+This project implements a basic router in C that handles ARP requests and replies, 
+ICMP error messages, and IP forwarding according to a pre-defined routing table.
+
+*** Features ***
+- ARP Handling: Manages ARP requests and replies to resolve network addresses.
+- ICMP Error Handling: Sends ICMP error messages for unreachable destinations and 
+other network issues.
+- IP Forwarding: Forwards IP packets based on longest prefix match (LPM) against a
+routing table.
+- Routing Table: Utilizes a dynamic routing table for making forwarding decisions.
+- Packet Queuing: Queues packets when waiting for ARP resolution.
+
+*** Implementation details ***
+- ARP Table Management: Handles the association between IP addresses and MAC 
+addresses.
+- Routing Table Management: Stores and searches for routes using a longest prefix
+match algorithm.
+- Packet Processing: Processes incoming packets, determines their type 
+(ARP, ICMP, IP), and handles them accordingly.
+
+*** Functions ***
+- send_arp_reply: This function is responsible for generating and sending an ARP
+reply packet in response to an ARP request. When a device wants to know the MAC
+address associated with an IP address, it sends an ARP request. Upon receiving
+such a request, if the IP matches one of the router's interfaces, this function
+constructs an ARP reply.
+- send_arp_request: This function sends an ARP request to resolve the MAC address
+of the next-hop IP address required for packet forwarding:
+    - Ethernet Header: It uses a broadcast MAC address since the destination MAC 
+    is unknown.
+    - ARP Header: Sets the operation to request and fills in the router’s IP and
+    the next-hop IP from the routing table entry.
+    - Packet Assembly: Constructs the full ARP packet by combining the Ethernet 
+    and ARP headers and queues it if the ARP response is pending.
+- send_icmp_error: ICMP Type and Code: Determines the type of ICMP message 
+(e.g., destination unreachable, time exceeded) based on the situation.
+    - Packet Construction: It creates a new IP header for the ICMP message, 
+    recalculates the checksum, and prepares the ICMP header with the appropriate 
+    error messages.
+    - Data Payload: Includes the original IP header and the first 8 bytes of the
+    original packet's payload to help the sender diagnose the issue.
+    - Sending: Sends the constructed ICMP error packet through the network 
+    interface.
+- send_echo_reply: This function is triggered when an ICMP echo request (ping) is
+received:
+    - IP and ICMP Headers: Modifies the incoming IP header to swap the source and 
+    destination addresses and recalculates the checksum. The ICMP header is 
+    adjusted to represent an echo reply.
+    - Packet Sending: Constructs the complete echo reply packet and sends it out.
+- lpm_compare: Used by the qsort function to order the routing table. Routes are
+sorted primarily by prefix and then by mask length, facilitating efficient longest 
+prefix matching using binary search.
+- get_best_route: Implements the longest prefix matching algorithm to find the
+best routing table entry for a given destination IP and uses a binary search over
+the sorted routing table to efficiently find the route entry that best matches
+the destination IP address.
+- get_arp_entry: Searches the ARP table for a given IP address to find the 
+corresponding MAC address.
+- get_arp_reply: Processes received ARP replies to update the ARP table and 
+potentially sends out any queued packets that were waiting for this ARP resolution:
+    - Updating ARP Table: Adds the new MAC and IP association to the ARP table.
+    - Handling Queued Packets: Checks if there are packets queued awaiting this 
+    ARP resolution and sends them if possible.
+- main: The entry point of the program:
+    - Initialization: Sets up the network interfaces, loads the routing table 
+    from a file, and prepares the ARP table and packet queues.
+    - Main Loop: Continuously receives packets and dispatches them to the 
+    appropriate handler based on their type (ARP, ICMP, IP).
