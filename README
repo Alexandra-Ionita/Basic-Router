@@ -1,13 +1,6 @@
 ****Name: Ionita Alexandra-Mihaela
-****Group: 324CB
 
                         Dataplane Router
-                           100/100
-
-I have implemented all the tasks, including the ARP Protocol one. I took a sleep
-day to finish the homework and I completed the request about it. I also tried to
-do the rtable_entry search efficient by sorting it with qsort and searching for
-the entry using binary search.
 
 *** Description ***
 This project implements a basic router in C that handles ARP requests and replies, 
